@@ -7,6 +7,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:test1@localhost:5432/posts'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 class BlogPost(db.Model):
@@ -21,7 +22,6 @@ db.create_all()
 def  __repr__(self):
     return 'Blog post ' +  str(self.id) 
     
-
 
 @app.route('/')
 def index():
@@ -38,8 +38,8 @@ def post():
        db.session.commit()
        return redirect('/posts') 
     else:
-        all_posts = BlogPost.query.order_by(BlogPost.date_posted).all()  
-    return render_template('posts.html', post=all_posts)
+       all_posts = BlogPost.query.order_by(BlogPost.date_posted).all()  
+    return render_template('posts.html', posts=all_posts)
 
 @app.route("/home/users/<string:name>/post/<int:id>")
 def hello(name, id):
@@ -53,15 +53,21 @@ def get_req():
 def delete(id):
     post = BlogPost.query.get_or_404(id)
     db.session.delete(post)
-    db.session.commit
+    db.session.commit()
     return redirect('/posts')
 
 @app.route('/posts/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
+        
     post = BlogPost.query.get_or_404(id)
-    db.session.delete(post)
-    db.session.commit
-    return redirect('/posts')
+    if request.method == 'POST':
+        post.title = request.form['title']
+        post.author = request.form['author']
+        post.content = request.form['content']
+        db.session.commit()
+        return redirect('/posts') 
+    else:
+        return render_template('edit.html', post=post) 
     
 if __name__ == "__main__":
      app.run(debug=True)
