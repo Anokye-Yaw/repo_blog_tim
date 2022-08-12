@@ -3,32 +3,38 @@
 {% block head %}
 <title>Posts</title>
 {% endblock %}
-   
+
 
 {% block body %}
 <h1>All Posts</h1>
 <hr>
-   <h2>Create a New Blog Post:</h2>
-   <form action='/posts' method='POST'>
-      Title:<input type='text' name='title' id='title'><br>
-      Author:<input type='text' name='author' id='author'><br>
-      Post:<input type='text' name='content' id='content'><br>
-           <input type='submit' value='Post'>
-   </form>
+<h2>Create a New Blog Post:</h2>
+<form action='/posts' method='POST'>
+   <label for="title">Title:</label>
+   <input class="form-control" type='text' name='title' id='title' placeholder="Enter Title" aria-label="title"><br>
+   <label for="author">Author:</label>
+   <input class="form-control" type='text' name='author' id='author' placeholder="Enter Author" aria-label="author"><br>
+   <label for="content">Post:</label>
+   <textarea class="form-control" name='content' id='content' rows="3"></textarea>
+   <br>
+   <input type='submit' value='Post'>
+</form>
 <hr>
 
 {% for post in posts %}
-      <h2>{{ post.title}}</h2>
+<h2>{{ post.title}}</h2>
 
-      {% if post.author %}
-         <h3>By: {{post.author}}</h3>
-      {% else %}
-         <h3>By: N/A</h3>
-      {% endif %}   
+{% if post.author %}
+<small>Written By: {{post.author}} on {{post.date_posted}}</small>
+{% else %}
+<small>Written By: Unknown on {{post.date_posted}}</small>
+{% endif %}
 
-      <p>{{ post.content}}</p>
-      <a href="/posts/delete/{{post.id}}">Delete</a>&nbsp;
-      <a href="/posts/edit/{{post.id}}">Edit</a>
-   {% endfor %}
-   
+<p style="white-space:pre-wrap">{{post.content}}</p>
+<a class="btn btn-danger" href="/posts/delete/{{post.id}}">Delete</a>&nbsp;
+<a class="btn btn-success" href="/posts/edit/{{post.id}}">Edit</a>
+<br>
+<hr>
+{% endfor %}
+
 {% endblock %}
